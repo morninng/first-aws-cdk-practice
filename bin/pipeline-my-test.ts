@@ -3,8 +3,14 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { PipelineMyTestStack } from '../lib/pipeline-my-test-stack';
 
+import { BillingStack } from "../lib/billing-stack";
+
 const app = new cdk.App();
 new PipelineMyTestStack(app, 'PipelineMyTestStack', {
+
+
+
+
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -18,4 +24,14 @@ new PipelineMyTestStack(app, 'PipelineMyTestStack', {
   // env: { account: '123456789012', region: 'us-east-1' },
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+});
+
+
+const billingStack = new BillingStack(app, "BillingStack", {
+  env: {
+    region: 'ap-northeast-1',
+    account: '546915087846',
+  },
+  budgetAmount: 5000,
+  emailAddress: "yuta.moriyama@gmail.com",
 });

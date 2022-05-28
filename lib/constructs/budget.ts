@@ -1,0 +1,44 @@
+
+import { Construct } from 'constructs';
+// import * as sqs from 'aws-cdk-lib/aws-sqs';
+// import { CfnBudgetsActionProps } from 'aws-cdk-lib/aws-budgets';
+import { CfnBudget } from 'aws-cdk-lib/aws-budgets';
+
+interface BudgetProps {
+  budgetAmount: number;
+  emailAddress: string;
+}
+
+export class Budget extends Construct {
+  constructor(scope: Construct, id: string, props: BudgetProps) {
+    super(scope, id);
+
+    new CfnBudget(this, "Budget", {
+      budget: {
+        budgetLimit: {
+          amount: props.budgetAmount,
+          unit: "USD",
+        },
+        budgetName: "Monthly Budget",
+        budgetType: "COST",
+        timeUnit: "MONTHLY",
+      },
+      notificationsWithSubscribers: [
+        {
+          notification: {
+            threshold: 100,
+            notificationType: "ACTUAL",
+            comparisonOperator: "GREATER_THAN",
+            thresholdType: "PERCENTAGE",
+          },
+          subscribers: [
+            {
+              subscriptionType: "EMAIL",
+              address: props.emailAddress,
+            },
+          ],
+        },
+      ],
+    });
+  }
+}
