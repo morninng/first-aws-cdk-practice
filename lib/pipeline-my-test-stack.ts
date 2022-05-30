@@ -66,7 +66,7 @@ export class PipelineMyTestStack extends Stack {
       actions: [
         new CloudFormationCreateUpdateStackAction({
           actionName: "Pipeline_Update",
-          stackName: "PipelineStack",
+          stackName: "PipelineMyTestStack",
           templatePath: this.cdkBuildOutput.atPath(
             "PipelineMyTestStack.template.json"
           ),
