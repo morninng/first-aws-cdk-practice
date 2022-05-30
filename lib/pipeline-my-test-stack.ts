@@ -59,6 +59,7 @@ export class PipelineMyTestStack extends Stack {
         })
       ],
     });
+    
 
 
     this.pipeline.addStage({
@@ -76,7 +77,7 @@ export class PipelineMyTestStack extends Stack {
     });
 
 
-    
+
   }
 
 
