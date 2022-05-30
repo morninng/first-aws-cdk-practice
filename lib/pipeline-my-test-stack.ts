@@ -16,6 +16,7 @@ export class PipelineMyTestStack extends Stack {
   private readonly pipeline: Pipeline;
   private readonly cdkBuildOutput: Artifact;
   private readonly serviceBuildOutput: Artifact;
+  private readonly serviceSourceOutput: Artifact;
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -27,7 +28,7 @@ export class PipelineMyTestStack extends Stack {
     });
 
     const cdkSourceOutput = new Artifact("CDKSourceOutput");
-    const serviceSourceOutput = new Artifact("serviceSourceOutput");
+    this.serviceSourceOutput = new Artifact("serviceSourceOutput");
     this.pipeline.addStage({
       stageName: "Source",
       actions: [
@@ -45,7 +46,7 @@ export class PipelineMyTestStack extends Stack {
           branch: "master",
           actionName: "Service_Source",
           oauthToken: SecretValue.secretsManager("aws-code-pipeline-test2"),
-          output: serviceSourceOutput,
+          output: this.serviceSourceOutput,
         }),
       ],
     });
@@ -71,7 +72,7 @@ export class PipelineMyTestStack extends Stack {
 
         new CodeBuildAction({
           actionName: "Service_Build",
-          input: serviceSourceOutput,
+          input: this.serviceSourceOutput,
           outputs: [this.serviceBuildOutput],
           project: new PipelineProject(this, "ServiceBuildProject", {
             environment: {
