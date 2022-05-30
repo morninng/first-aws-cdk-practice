@@ -1,5 +1,5 @@
 import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
-import { Artifact, IStage, Pipeline } from "aws-cdk-lib/aws-codepipeline";
+import { Artifact, Pipeline } from "aws-cdk-lib/aws-codepipeline";
 import { Construct } from 'constructs';
 
 import { GitHubSourceAction, CodeBuildAction } from "aws-cdk-lib/aws-codepipeline-actions";
