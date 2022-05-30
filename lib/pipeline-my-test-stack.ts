@@ -20,8 +20,8 @@ export class PipelineMyTestStack extends Stack {
 
     this.pipeline = new Pipeline(this, "Pipeline", {
       pipelineName: "Pipeline",
-      crossAccountKeys: true,
-      restartExecutionOnUpdate: true,
+      crossAccountKeys: false,
+      // restartExecutionOnUpdate: true,
     });
 
     const cdkSourceOutput = new Artifact("CDKSourceOutput");
@@ -30,10 +30,10 @@ export class PipelineMyTestStack extends Stack {
       actions: [
         new GitHubSourceAction({
           owner: "morninng",
-          repo: "aws-pipeline",
-          branch: "first-aws-cdk-practice",
+          repo: "first-aws-cdk-practice",
+          branch: "master",
           actionName: "Pipeline_Source",
-          oauthToken: SecretValue.secretsManager("github-cdk-practice-token"),
+          oauthToken: SecretValue.secretsManager("aws-code-pipeline-test2"),
           output: cdkSourceOutput,
         })
       ],
@@ -59,8 +59,6 @@ export class PipelineMyTestStack extends Stack {
         })
       ],
     });
-
-
 
 
   }
