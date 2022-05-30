@@ -1,7 +1,8 @@
 import { SecretValue, Stack, StackProps } from 'aws-cdk-lib';
-import { Artifact, Pipeline } from "aws-cdk-lib/aws-codepipeline";
+import { Artifact, Pipeline, IStage } from "aws-cdk-lib/aws-codepipeline";
 import { Construct } from 'constructs';
 
+import { ServiceStack } from './service-stack';
 import { GitHubSourceAction, CodeBuildAction, CloudFormationCreateUpdateStackAction } from "aws-cdk-lib/aws-codepipeline-actions";
 
 import {
@@ -14,6 +15,7 @@ export class PipelineMyTestStack extends Stack {
 
   private readonly pipeline: Pipeline;
   private readonly cdkBuildOutput: Artifact;
+  private readonly serviceBuildOutput: Artifact;
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -25,6 +27,7 @@ export class PipelineMyTestStack extends Stack {
     });
 
     const cdkSourceOutput = new Artifact("CDKSourceOutput");
+    const serviceSourceOutput = new Artifact("serviceSourceOutput");
     this.pipeline.addStage({
       stageName: "Source",
       actions: [
@@ -35,7 +38,15 @@ export class PipelineMyTestStack extends Stack {
           actionName: "Pipeline_Source",
           oauthToken: SecretValue.secretsManager("aws-code-pipeline-test2"),
           output: cdkSourceOutput,
-        })
+        }),
+        new GitHubSourceAction({
+          owner: "morninng",
+          repo: "cdk-test-aws-lambda",
+          branch: "master",
+          actionName: "Service_Source",
+          oauthToken: SecretValue.secretsManager("aws-code-pipeline-test2"),
+          output: serviceSourceOutput,
+        }),
       ],
     });
 
@@ -56,10 +67,24 @@ export class PipelineMyTestStack extends Stack {
               "build-specs/cdk-build-spec.yml"
             ),
           }),
-        })
+        }),
+
+        new CodeBuildAction({
+          actionName: "Service_Build",
+          input: serviceSourceOutput,
+          outputs: [this.serviceBuildOutput],
+          project: new PipelineProject(this, "ServiceBuildProject", {
+            environment: {
+              buildImage: LinuxBuildImage.STANDARD_5_0,
+            },
+            buildSpec: BuildSpec.fromSourceFilename(
+              "build-specs/service-build-spec.yml" // これは、lambeaのコードのなかにある。
+            ),
+          }),
+        }),
+
       ],
     });
-    
 
 
     this.pipeline.addStage({
@@ -76,9 +101,8 @@ export class PipelineMyTestStack extends Stack {
       ],
     });
 
-
-
   }
+
 
 
 
