@@ -53,6 +53,7 @@ export class PipelineMyTestStack extends Stack {
 
 
     this.cdkBuildOutput = new Artifact("CdkBuildOutput");
+    this.serviceBuildOutput = new Artifact("ServiceBuildOutput");
     this.pipeline.addStage({
       stageName: "Build",
       actions: [
